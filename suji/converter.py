@@ -20,29 +20,39 @@ def values(src):
     :return: a list of the numerical value objects.
     """
     acc = Acc()
-    result = []
-    for i, c in enumerate(src):
-        number = Char.get_number(c)
-        cardinal = Char.get_cardinal(c)
-        is_terminate = Char.is_delimiter(c)
-        is_decimal_point = Char.is_decimal_point(c)
+    results = []
 
-        if number is not None:
-            acc.turn_to_decimal_state(i)
-            acc.attach_number(i, number)
-        elif cardinal is not None:
-            acc.attach_cardinal(i, cardinal)
-        elif is_decimal_point:
-            acc.turn_to_decimal_state(i)
-        elif is_terminate or (i + 1 == len(src)):
-            if acc.inside:
-                result.append(acc.get_value())
-                acc = Acc()
-        else:
-            if acc.inside:
-                result.append(acc.get_value())
-                acc = Acc()
-    return result
+    for idx, char in enumerate(src):
+        num = Char.get_number(char)
+        cardinal = Char.get_cardinal(char)
+
+        if num is not None:
+            acc.attach_number(idx, num)
+            continue
+
+        if cardinal is not None:
+            acc.attach_cardinal(idx, cardinal)
+            continue
+
+        if Char.is_delimiter(char) or Char.is_decimal_point(char):
+            continue
+
+        # If the current character is not related to a number and there was a accumulating
+        # process happening before, it should be processed.
+        if acc.inside:
+            result = acc.get_value()
+            if result['val'] is not None:
+                results.append(result)
+
+            acc = Acc()  # Initialize a new accumulator for any future sequences.
+
+    # After finishing the loop, check one last time for any numbers that might not have been added.
+    if acc.inside:
+        result = acc.get_value()
+        if result['val'] is not None:
+            results.append(result)
+
+    return results
 
 def value(src):
     """ Convert from a string with Japanese number notations to the numerical string.
