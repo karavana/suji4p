@@ -22,33 +22,40 @@ def values(src):
     acc = Acc()
     results = []
 
-    for index, char in enumerate(src):
-        number = Char.get_number(char)
-        if number is not None:
-            acc.attach_number(index, number)
-            continue
-
+    for idx, char in enumerate(src):
+        num = Char.get_number(char)
         cardinal = Char.get_cardinal(char)
+
+        if num is not None:
+            acc.attach_number(idx, num)
+            continue
+
         if cardinal is not None:
-            acc.attach_cardinal(index, cardinal)
+            acc.attach_cardinal(idx, cardinal)
             continue
-
-        if Char.is_decimal_point(char):
-            acc.turn_to_decimal_state(index)
-            continue
-
-        if acc.inside:
-            acc.inside = False
-            results.append(acc.get_value())
 
         if Char.is_delimiter(char):
+            acc.index_increment(idx)
+            continue
+        
+        if Char.is_decimal_point(char):
+            acc.turn_to_decimal_state(idx)
             continue
 
-        acc.__val_cardinal = 0
+        # If the current character is not related to a number and there was a accumulating
+        # process happening before, it should be processed.
+        if acc.inside:
+            result = acc.get_value()
+            if result['val'] is not None:
+                results.append(result)
 
+            acc = Acc()  # Initialize a new accumulator for any future sequences.
+
+    # After finishing the loop, check one last time for any numbers that might not have been added.
     if acc.inside:
-        acc.inside = False
-        results.append(acc.get_value())
+        result = acc.get_value()
+        if result['val'] is not None:
+            results.append(result)
 
     return results
 
