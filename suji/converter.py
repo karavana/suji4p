@@ -19,7 +19,30 @@ def values(src):
     :param src: a input string.
     :return: a list of the numerical value objects.
     """
-    pass
+    acc = Acc()
+    result = []
+    for i, c in enumerate(src):
+        number = Char.get_number(c)
+        cardinal = Char.get_cardinal(c)
+        is_terminate = Char.is_delimiter(c)
+        is_decimal_point = Char.is_decimal_point(c)
+
+        if number is not None:
+            acc.turn_to_decimal_state(i)
+            acc.attach_number(i, number)
+        elif cardinal is not None:
+            acc.attach_cardinal(i, cardinal)
+        elif is_decimal_point:
+            acc.turn_to_decimal_state(i)
+        elif is_terminate or (i + 1 == len(src)):
+            if acc.inside:
+                result.append(acc.get_value())
+                acc = Acc()
+        else:
+            if acc.inside:
+                result.append(acc.get_value())
+                acc = Acc()
+    return result
 
 def value(src):
     """ Convert from a string with Japanese number notations to the numerical string.
