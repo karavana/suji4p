@@ -6,7 +6,6 @@ and a method to convert from a string with Japanese number notations to the nume
 from suji.accumulator import Acc
 from suji.char import Char
 
-
 def values(src):
     """ Convert from Japanese number notation to numerical value.
     The return value is a list of result objects.
@@ -20,42 +19,7 @@ def values(src):
     :param src: a input string.
     :return: a list of the numerical value objects.
     """
-    val = []
-    acc = Acc()
-
-    for i in range(0, len(src)):
-        if Char.is_delimiter(src[i]):
-            acc.index_increment(i)
-            continue
-
-        if Char.is_decimal_point(src[i]):
-            acc.turn_to_decimal_state(i)
-            continue
-
-        cardinal = Char.get_cardinal(src[i])
-        if cardinal is not None:
-            if acc.inside:
-                acc.attach_cardinal(i, cardinal)
-            elif 1 < cardinal:
-                acc.attach_cardinal(i, cardinal)
-            continue
-
-        number = Char.get_number(src[i])
-        if number is not None:
-            acc.attach_number(i, number)
-            continue
-        
-        if not acc.inside:
-            continue
-
-        val.append(acc.get_value())
-        acc = Acc()
-
-    if acc.inside:
-        val.append(acc.get_value())
-
-    return val
-
+    pass
 
 def value(src):
     """ Convert from a string with Japanese number notations to the numerical string.
@@ -68,7 +32,6 @@ def value(src):
     vals = values(src)
     if 0 == len(vals):
         return src
-
     start = 0
     s = ''
     for v in vals:
@@ -77,6 +40,4 @@ def value(src):
         start = v['end']
     s += src[start:len(src)]
     return s
-
-
 __all__ = ['values', 'value']
