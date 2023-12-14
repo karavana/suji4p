@@ -29,9 +29,11 @@ def values(src):
         if num is not None:
             acc.attach_number(idx, num)
             continue
-
         if cardinal is not None:
-            acc.attach_cardinal(idx, cardinal)
+            if not acc.inside and cardinal < 1: 
+                continue
+            else:
+                acc.attach_cardinal(idx, cardinal)
             continue
 
         if Char.is_delimiter(char):
@@ -42,7 +44,7 @@ def values(src):
             acc.turn_to_decimal_state(idx)
             continue
 
-        # If the current character is not related to a number and there was a accumulating
+        # If the current character is not related to a number and there was an accumulating
         # process happening before, it should be processed.
         if acc.inside:
             result = acc.get_value()
